@@ -1,46 +1,22 @@
-right_triangle() {
-   echo $'\ue0b0'
-}
-
-arrow_start() {
-   echo "%{$FG[$ARROW_FG]%}%{$BG[$ARROW_BG]%}"
-}
-
-arrow_end() {
-   echo "%{$reset_color%}%{$FG[$NEXT_ARROW_FG]%}%{$BG[$NEXT_ARROW_BG]%}$(right_triangle)%{$reset_color%}"
-}
-
 # Show current directory, two levels deep
 directory() {
-    ARROW_FG="016"
-    ARROW_BG="183"
-    NEXT_ARROW_BG="139"
-    NEXT_ARROW_FG="183"
-    echo "$(arrow_start)  %2~ $(arrow_end)"
+   echo "%B%2~%b"
 }
 
 node_version() {
-   ARROW_FG="016"
-   ARROW_BG="139"
-   NEXT_ARROW_BG="139"
-   NEXT_ARROW_FG="096"
    NODE_VERSION=`node --version`
-   echo "$(arrow_start) %F{000}⬢ $NODE_VERSION%f $(arrow_end)"
+   echo " \u276f %F{084}⬢ $NODE_VERSION%f"
 }
 
 current_package() {
-   ARROW_FG="016"
-   ARROW_BG="139"
-   NEXT_ARROW_BG=""
-   NEXT_ARROW_FG="096"
-
-
-   PACKAGE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | tr -d '[[:space:]]')
-   echo "$(arrow_start) 📦 $PACKAGE_VERSION $(arrow_end)"
+   if [ -f "package.json" ]; then
+      PACKAGE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | tr -d '[[:space:]]')
+      echo " \u276f 📦 $PACKAGE_VERSION "
+   fi
 }
 
 node_project() {
-   if [ -f "package.json" ]; then
+   if [[ -f package.json || -d node_modules || -n *.js(#qN^/) ]]; then
       echo "$(node_version)$(current_package)"
    fi
 }
@@ -49,12 +25,15 @@ prompt_indicator() {
    echo $'%B\u276f%b'
 }
 
-# set the git_prompt_info text
-ZSH_THEME_GIT_PROMPT_PREFIX="(\uE0A0"
-ZSH_THEME_GIT_PROMPT_SUFFIX=")"
-ZSH_THEME_GIT_PROMPT_DIRTY=" ⁎"
-ZSH_THEME_GIT_PROMPT_CLEAN=" ✓"
 
-PROMPT='$(directory)$(node_project)
+
+# set the git_prompt_info text
+ZSH_THEME_GIT_PROMPT_PREFIX="(%B\uE0A0 "
+ZSH_THEME_GIT_PROMPT_SUFFIX=")"
+ZSH_THEME_GIT_PROMPT_DIRTY=" %b%F{red}⁎%f"
+ZSH_THEME_GIT_PROMPT_CLEAN=" %b%F{084}✓%f"
+
+PROMPT='
+$(directory)$(node_project)
 $(prompt_indicator) '
 RPROMPT='$(git_prompt_info)'
