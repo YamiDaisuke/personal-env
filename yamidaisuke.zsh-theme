@@ -4,8 +4,10 @@ directory() {
 }
 
 node_version() {
-   NODE_VERSION=`node --version`
-   echo " \u276f %F{084}⬢ $NODE_VERSION%f"
+   if [ command -v node &> /dev/null ]; then
+       NODE_VERSION=`node --version`
+       echo " \u276f %F{084}⬢ $NODE_VERSION%f"
+   fi
 }
 
 current_package() {
